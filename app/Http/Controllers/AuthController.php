@@ -17,18 +17,23 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $user = User::where('email', $request->email)
-                ->where('password', $request->password)
-                ->first();
+       $credentials = $request->only('email', 'password');
+    $user = User::where('email', $credentials['email'])->first();
 
-    if ($user) {
+    if ($user && $credentials['password'] === $user->password) {
+
         session([
             'user_id' => $user->id,
             'user_name' => $user->name,
             'user_role' => $user->role,
         ]);
 
-        return redirect('/dashboard');
+
+        if ($user->role === 'admin') {
+            return redirect('/admin/dashboard');
+        } else {
+            return redirect('/dashboard');
+        }
     }
 
     return redirect('/login')->with('error', 'Email atau password salah.');
@@ -46,12 +51,12 @@ public function register(Request $request)
         'password' => 'required|min:6|confirmed',
     ]);
 
-    User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'role' => 'user' // default untuk pendaftar baru
-    ]);
+   User::create([
+    'name' => $request->name,
+    'email' => $request->email,
+    'password' => $request->password,
+    'role' => 'user'
+]);
 
     return redirect('/login')->with('success', 'Akun berhasil dibuat. Silakan login.');
 }

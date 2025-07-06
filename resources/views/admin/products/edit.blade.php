@@ -1,32 +1,84 @@
-<form action="/admin/products/{{ $product->id }}" method="POST" enctype="multipart/form-data">
-    @csrf
-    @method('PUT')
+@extends('layouts.admin')
 
-    <!-- Field lainnya -->
-    <label>Nama Produk:</label>
-    <input type="text" name="name" value="{{ $product->name }}" required><br>
+@section('title', 'Edit Produk')
 
-    <label>Merk:</label>
-    <input type="text" name="brand" value="{{ $product->brand }}" required><br>
+@section('breadcrumb')
+    <li>
+        <div class="flex items-center">
+            <svg class="w-4 h-4 mx-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6 9a1 1 0 011-1h6a1 1 0 010 2H7a1 1 0 01-1-1z" />
+            </svg>
+            <a href="/admin/products" class="text-indigo-600 hover:underline">Produk</a>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center">
+            <svg class="w-4 h-4 mx-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6 9a1 1 0 011-1h6a1 1 0 010 2H7a1 1 0 01-1-1z" />
+            </svg>
+            <span class="text-gray-500">Edit Produk</span>
+        </div>
+    </li>
+@endsection
 
-    <label>Harga:</label>
-    <input type="number" name="price" value="{{ $product->price }}" required><br>
+@section('content')
+    <h2 class="text-2xl font-bold text-indigo-700 mb-6">✏️ Edit Produk</h2>
 
-    <label>Stok:</label>
-    <input type="number" name="stock" value="{{ $product->stock }}" required><br>
+  <form action="/admin/products/{{ $product->id }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
-    <label>Deskripsi:</label><br>
-    <textarea name="description">{{ $product->description }}</textarea><br>
+        <div>
+            <label class="block mb-1 font-medium text-gray-700">Nama Produk:</label>
+            <input type="text" name="name" value="{{ $product->name }}" required
+                class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
 
-    <!-- Gambar lama -->
-    @if($product->image)
-        <p>Gambar Saat Ini:</p>
-        <img src="{{ asset('storage/' . $product->image) }}" width="150"><br>
-    @endif
+        <div>
+            <label class="block mb-1 font-medium text-gray-700">Merk:</label>
+            <input type="text" name="brand" value="{{ $product->brand }}" required
+                class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
 
-    <!-- Upload baru -->
-    <label>Ganti Foto (opsional):</label>
-    <input type="file" name="image" accept="image/*"><br><br>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-1 font-medium text-gray-700">Harga (Rp):</label>
+                <input type="number" name="price" value="{{ $product->price }}" required
+                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block mb-1 font-medium text-gray-700">Stok:</label>
+                <input type="number" name="stock" value="{{ $product->stock }}" required
+                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+        </div>
 
-    <button type="submit">Update Produk</button>
-</form>
+        <div>
+            <label class="block mb-1 font-medium text-gray-700">Deskripsi:</label>
+            <textarea name="description" rows="4"
+                class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ $product->description }}</textarea>
+        </div>
+
+        @if($product->image)
+            <div>
+                <p class="font-medium text-gray-700">Gambar Saat Ini:</p>
+                <img src="{{ asset('storage/' . $product->image) }}" alt="Gambar Produk" class="w-40 mt-2 rounded shadow">
+            </div>
+        @endif
+
+        <div>
+            <label class="block mb-1 font-medium text-gray-700">Ganti Foto (opsional):</label>
+            <input type="file" name="image" accept="image/*"
+                class="w-full border border-gray-300 rounded-md px-4 py-2 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+        </div>
+
+        <div class="pt-4">
+            <button type="submit"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded shadow transition">
+                💾 Update Produk
+            </button>
+            <a href="/admin/products"
+                class="ml-3 text-gray-600 hover:underline text-sm">← Kembali</a>
+        </div>
+    </form>
+@endsection

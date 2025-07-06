@@ -9,5 +9,8 @@ export default defineConfig({
             refresh: true,
         }),
         tailwindcss(),
+        require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/aspect-ratio'),
     ],
 });

@@ -111,3 +111,4 @@ Route::middleware([\App\Http\Middleware\CheckLogin::class])->group(function () {
 Route::post('/transactions', [App\Http\Controllers\TransactionController::class, 'store']);
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/transactions/buy/{productId}', [TransactionController::class, 'buy'])->name('transactions.buy');
