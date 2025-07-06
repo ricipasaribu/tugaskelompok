@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -15,27 +17,49 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $user = DB::table('users')
-                ->where('email', $request->email)
-                ->where('password', $request->password) // tanpa hash (karena kamu ingin simpel)
+        $user = User::where('email', $request->email)
+                ->where('password', $request->password)
                 ->first();
 
-        if ($user) {
-            session([
-                'user_id' => $user->id,
-                'user_name' => $user->name,
-                'user_role' => $user->role
-            ]);
+    if ($user) {
+        session([
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'user_role' => $user->role,
+        ]);
 
-            return redirect('/dashboard');
-        } else {
-            return redirect('/login')->with('error', 'Email atau password salah.');
-        }
+        return redirect('/dashboard');
     }
+
+    return redirect('/login')->with('error', 'Email atau password salah.');
+    }
+    public function showRegisterForm()
+{
+    return view('auth.register');
+}
+
+public function register(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:100',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:6|confirmed',
+    ]);
+
+    User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => 'user' // default untuk pendaftar baru
+    ]);
+
+    return redirect('/login')->with('success', 'Akun berhasil dibuat. Silakan login.');
+}
 
     public function logout()
     {
         session()->flush();
         return redirect('/login');
     }
+
 }
