@@ -6,15 +6,17 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 
+
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = \App\Models\Product::all();
-        return view('admin.products.index', compact('products'));
-        if (session('user_role') !== 'admin') {
-            abort(403, 'Akses khusus admin.');
-        }
+         if (session('user_role') !== 'admin') {
+        abort(403, 'Akses khusus admin.');
+    }
+
+    $products = Product::all();
+    return view('admin.products.index', compact('products'));
     }
     public function create()
 {
@@ -36,30 +38,41 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
-
-    $validated = $request->validate([
-        'name' => 'required',
-        'brand' => 'required',
-        'price' => 'required|numeric',
-        'stock' => 'required|numeric',
-        'description' => 'nullable',
-        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
-
-  
-    if ($request->hasFile('image')) {
-
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-
-        $validated['image'] = $request->file('image')->store('images', 'public');
+       // Cek apakah user adalah admin
+    if (session('user_role') !== 'admin') {
+        abort(403, 'Akses khusus admin.');
     }
 
+    // Ambil data produk
+    $product = Product::findOrFail($id);
+
+    // Validasi data yang dikirim dari form
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'brand' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        'stock' => 'required|numeric',
+        'description' => 'nullable|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+    ]);
+
+    // Jika user upload gambar baru
+    if ($request->hasFile('image')) {
+        // Hapus gambar lama (jika ada)
+       if ($product->image && Storage::disk('public')->exists($product->image)) {
+    Storage::disk('public')->delete($product->image);
+}
+
+        // Simpan gambar baru ke folder 'images' di storage/public
+        $path = $request->file('image')->store('images', 'public');
+        $validated['image'] = $path;
+    }
+
+    // Update produk dengan data baru
     $product->update($validated);
 
-    return redirect('/admin/products')->with('success', 'Produk berhasil diupdate.');
+    // Redirect kembali ke halaman produk admin
+    return redirect('/admin/products')->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function destroy($id)
